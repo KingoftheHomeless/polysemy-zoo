@@ -34,16 +34,19 @@ module Polysemy.Final
   , getInspectorS
   , getInitialStateS
 
-  -- * Interpretations to Final
-  , embedToFinal
-
     -- * Interpretations
   , runFinal
+  , runFinalPure
   , finalToFinal
   , runFinalSem
   , lowerFinal
+
+  -- * Interpretations for Other Effects
+  , embedToFinal
   ) where
 
+import Data.Coerce
+import Data.Functor.Identity
 import Data.Functor.Compose
 
 import Polysemy
@@ -82,23 +85,18 @@ withStrategic strat = withWeaving $ \s wv ins ->
 -- interpret higher-order effects in terms of the final monad.
 --
 -- 'interpretFinal' requires less boilerplate than using 'interpretH'
--- together with 'withStrategic', but is also less powerful.
--- Notably, 'interpretFinal' does not provide any means of
--- executing actions of @'Sem' r@ as you interpret each action.
--- If you need to do so, use 'interpretH' and 'withStrategic' instead.
+-- together with 'withStrategic'\/'withWeaving', but is also less powerful.
+-- 'interpretFinal' does not provide any means of executing actions
+-- of @'Sem' r@ as you interpret each action, and the provided interpreter
+-- is automatically recursively used to process higher-order occurences of
+-- @'Sem' (e ': r)@ to @'Sem' r@.
 --
--- /Beware/: Any interpreters built using this (or 'Final' in general)
--- will /not/ respect local/global state semantics based on the order of
--- interpreters run. You should signal interpreters that make use of
--- 'Final' by adding a "-Final" suffix to the names of these.
+-- If you need greater control of how the effect is interpreted, use
+-- use 'interpretH' together with 'withStrategic'\/'withWeaving' instead.
 --
--- State semantics of effects that are /not/
--- interpreted in terms of the final monad will always
--- appear local to effects that are interpreted in terms of the final monad.
---
--- State semantics between effects that are interpreted in terms of the final monad
--- depend on the final monad. E.g. if the final monad is a monad transformer stack,
--- then state semantics will depend on the order monad transformers are stacked.
+-- /Beware/: Effects that aren't interpreted in terms of the final
+-- monad will have local state semantics in regards to effects
+-- interpreted using 'interpretFinal'. See 'Final'.
 interpretFinal
     :: forall e m a r
      . (Member (Final m) r, Functor m)
@@ -122,15 +120,6 @@ interpretFinal n =
   in
     go
 {-# INLINE interpretFinal #-}
-
-------------------------------------------------------------------------------
--- | 'Strategic' is an environment in which you're capable of explicitly
--- threading higher-order effect states to the final monad.
--- This is a variant of @Tactics@ (see 'Tactical'), and usage
--- is extremely similar.
-type Strategic m n a = forall f. Functor f => Sem (WithStrategy m f n) (m (f a))
-
-type WithStrategy m f n = '[Strategy m f n]
 
 ------------------------------------------------------------------------------
 -- | Get a natural transformation capable of potentially inspecting values
@@ -203,12 +192,10 @@ runFinal = usingSem $ \u -> case extract u of
 {-# INLINE runFinal #-}
 
 ------------------------------------------------------------------------------
--- | Transform an @'Embed' m@ effect into a @'Final' m@ effect
-embedToFinal :: (Member (Final m) r, Functor m)
-             => Sem (Embed m ': r) a
-             -> Sem r a
-embedToFinal = interpret $ \(Embed m) -> embedFinal m
-{-# INLINE embedToFinal #-}
+-- | Run a 'Sem' containing only @'Final' 'Identity'@ as a pure value.
+runFinalPure :: forall a. Sem '[Final Identity] a -> a
+runFinalPure = coerce (runFinal @Identity @a)
+{-# INLINE runFinalPure #-}
 
 ------------------------------------------------------------------------------
 -- | Given natural transformations between @m1@ and @m2@, run a @'Final' m1@
@@ -254,5 +241,14 @@ lowerFinal :: Member (Embed m) r
            => (forall x. Sem r x -> m x)
            -> Sem (Final m ': r) a
            -> Sem r a
+-- TODO(KingoftheHomeless): Write everything out for efficiency?
 lowerFinal f = runFinalSem . finalToFinal embed f . raiseUnder
 {-# INLINE lowerFinal #-}
+
+------------------------------------------------------------------------------
+-- | Transform an @'Embed' m@ effect into a @'Final' m@ effect
+embedToFinal :: (Member (Final m) r, Functor m)
+             => Sem (Embed m ': r) a
+             -> Sem r a
+embedToFinal = interpret $ \(Embed m) -> embedFinal m
+{-# INLINE embedToFinal #-}

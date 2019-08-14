@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, Trustworthy #-}
 module Polysemy.Capture
   (-- * Effect
     Capture(..)
@@ -22,11 +22,10 @@ import Control.Monad
 import Control.Monad.Cont (ContT(..))
 
 import Polysemy
-import Polysemy.Final
 import Polysemy.Internal
 import Polysemy.Internal.Union
 
-import Polysemy.Cont.Internal
+import Polysemy.Cont.Internal (Ref(..))
 
 -----------------------------------------------------------------------------
 -- | A less powerful variant of 'Polysemy.Shift.Shift' that may always be

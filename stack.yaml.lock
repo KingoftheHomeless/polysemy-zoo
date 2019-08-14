@@ -5,19 +5,12 @@
 
 packages:
 - completed:
-    size: 107259
-    url: https://github.com/KingoftheHomeless/polysemy/archive/bc49d919d8d67574271fbaf8fbab0c91116d11e4.tar.gz
-    cabal-file:
-      size: 5528
-      sha256: 5ac0184c78d8e993c3bbf27dda32b52ef7a8bfdda0c5287bfb369735bcf222ae
-    name: polysemy
-    version: 1.0.0.0
-    sha256: 7cf50a7126ffa406af063eae32467bb65b62681ab92a88e8702be4611ed98dc2
+    hackage: polysemy-1.1.0.0@sha256:8b90933dab7a8f0ffd1d072dfc7b2858bb0118417c94f434370df5245cd61847,5675
     pantry-tree:
-      size: 5072
-      sha256: b8b9e613a074459d1fd56a742abebca378c259e632396b9ceb4afadc83274cb0
+      size: 3356
+      sha256: 5d9d0952238118e424b2ce2e4b9d5575e0a411a83e8e8ae137b26439a4b9751c
   original:
-    url: https://github.com/KingoftheHomeless/polysemy/archive/bc49d919d8d67574271fbaf8fbab0c91116d11e4.tar.gz
+    hackage: polysemy-1.1.0.0
 - completed:
     hackage: polysemy-plugin-0.2.2.0@sha256:2116c574077b89e9fce2431dc6f58682f9c3f6c6d151442a7a23b2e542d695d6,2563
     pantry-tree:

@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, Trustworthy #-}
 module Polysemy.Shift
   (
     module Polysemy.Cont
@@ -101,7 +101,7 @@ runShiftM = runShiftUnsafe
 --
 -- /Beware/: Effects that aren't interpreted in terms of the final monad
 -- will have local state semantics in regards to 'Shift' effects
--- interpreted this way. See 'interpretFinal'.
+-- interpreted this way. See 'Final'.
 shiftToFinal :: forall s m a r
               .  (Member (Final (ContT (Maybe s) m)) r, Monad m)
               => Sem (Shift (Ref m (Maybe s)) s ': r) a

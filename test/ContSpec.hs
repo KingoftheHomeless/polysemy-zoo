@@ -134,14 +134,14 @@ spec = do
       test3 `shouldBe` Right ()
 
   describe "runContM" $ do
-    it "should have global state semantics with runStateFinal" $
+    it "should have global state semantics with stateToEmbed" $
       test4 `shouldBe` (3, 3)
 
-    it "should have global state semantics with runStateInIORef" $ do
+    it "should have global state semantics with runStateIORef" $ do
       r <- test5
       r `shouldBe` (3, 3)
 
-  describe "runContFinal" $ do
+  describe "contToFinal" $ do
     it "should work just like runContPure/M." $
       test7 `shouldBe` (["Nothing", "at", "all."], ".")
 
@@ -152,3 +152,10 @@ spec = do
     it "should work with and have global state semantics with runState\
        \ run after it" $
       test6 `shouldBe` (3, 3)
+
+  describe "runContViaCapture" $ do
+    it "should obey local/global state semantics depending on\
+       \ the order interpreters are run and work fine with higher-order effects." $ do
+      undefined
+
+    it "should return Nothing"

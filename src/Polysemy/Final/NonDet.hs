@@ -13,6 +13,10 @@ import Polysemy.Final
 
 -----------------------------------------------------------------------------
 -- | Run an 'NonDet' effect through a final 'Alternative'
+--
+-- /Beware/: Effects that aren't interpreted in terms of the final
+-- monad will have local state semantics in regards to 'NonDet' effects
+-- interpreted this way. See 'Final'.
 nonDetToFinal :: (Member (Final m) r, Alternative m)
               => Sem (NonDet ': r) a
               -> Sem r a

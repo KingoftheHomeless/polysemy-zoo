@@ -24,7 +24,7 @@ import Polysemy.Writer hiding (tell, listen, pass)
 --
 -- /Beware/: Effects that aren't interpreted in terms of the final
 -- monad will have local state semantics in regards to 'Error' effects
--- interpreted this way. See 'interpretFinal'.
+-- interpreted this way. See 'Final'.
 errorToFinal :: (Member (Final m) r, MonadError e m)
              => Sem (Error e ': r) a
              -> Sem r a
@@ -42,7 +42,7 @@ errorToFinal = interpretFinal $ \case
 --
 -- /Beware/: Effects that aren't interpreted in terms of the final
 -- monad will have local state semantics in regards to 'Reader' effects
--- interpreted this way. See 'interpretFinal'.
+-- interpreted this way. See 'Final'.
 readerToFinal :: (Member (Final m) r, MonadReader i m)
               => Sem (Reader i ': r) a
               -> Sem r a
@@ -63,7 +63,7 @@ readerToFinal = interpretFinal $ \case
 --
 -- /Beware/: Effects that aren't interpreted in terms of the embedded
 -- monad will have local state semantics in regards to 'State' effects
--- interpreted this way. See 'interpretFinal'.
+-- interpreted this way. See 'Final'.
 stateToEmbed :: (Member (Embed m) r, MonadState s m)
              => Sem (State s ': r) a
              -> Sem r a
@@ -77,7 +77,7 @@ stateToEmbed = interpret $ \case
 --
 -- /Beware/: Effects that aren't interpreted in terms of the final
 -- monad will have local state semantics in regards to 'Writer' effects
--- interpreted this way. See 'interpretFinal'.
+-- interpreted this way. See 'Final'.
 writerToFinal :: (Member (Final m) r, MonadWriter o m)
               => Sem (Writer o ': r) a
               -> Sem r a

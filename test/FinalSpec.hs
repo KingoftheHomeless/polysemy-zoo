@@ -54,7 +54,7 @@ test1 = do
   runFinal
     . embedToFinal
     . runStateIORef ref -- Order of these interpreters don't matter
-    . runErrorIOFinal
+    . errorToIOFinal
     . fixpointToFinal
     . asyncToIOFinal
      $ do
@@ -75,7 +75,7 @@ test2 :: IO ([String], Either () ())
 test2 =
     runFinal
   . runTraceList
-  . runErrorIOFinal
+  . errorToIOFinal
   . asyncToIOFinal
   $ do
   fut <- async $ do

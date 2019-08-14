@@ -28,6 +28,8 @@ dependencies:
 - polysemy-plugin >= 0.2
 - random >= 1.1 && <1.2
 - reflection >= 2.1.4 && < 3.0.0
+- transformers >= 0.5.2.0 && < 0.6
+- unordered-containers
 - ghc-prim >= 0.5.2 && < 0.6
 - hedis >= 0.10 && < 0.13
 - async >= 2.2 && < 3

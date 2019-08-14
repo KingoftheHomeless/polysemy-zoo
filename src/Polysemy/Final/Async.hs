@@ -2,7 +2,8 @@ module Polysemy.Final.Async
   (
     module Polysemy.Async
   , module Polysemy.Final
-  , runAsyncFinal
+  , asyncToIOFinal
+  , asyncToIOFinalGlobal
   ) where
 
 import qualified Control.Concurrent.Async as A
@@ -10,6 +11,7 @@ import qualified Control.Concurrent.Async as A
 import Polysemy
 import Polysemy.Async
 import Polysemy.Final
+import Polysemy.Final.IO
 
 ------------------------------------------------------------------------------
 -- | Run an 'Async' effect through final 'IO'
@@ -21,18 +23,33 @@ import Polysemy.Final
 -- interpreted this way. See 'interpretFinal'.
 --
 -- Notably, unlike 'asyncToIO', this is not consistent with
--- 'Polysemy.State.State' unless 'Polysemy.State.runStateInIORef' is used.
+-- 'Polysemy.State.State' unless 'Polysemy.State.runStateIORef' is used.
 -- State that seems like it should be threaded globally throughout the `Async`
 -- /will not be./
 --
--- Prefer 'asyncToIO' unless its unsafe or inefficient in the context of your
--- application.
-runAsyncFinal :: Member (Final IO) r
-              => Sem (Async ': r) a
-              -> Sem r a
-runAsyncFinal = interpretFinal $ \case
+-- Prefer 'asyncToIO' or 'asyncToIOThreadless' unless these are unsafe or
+-- inefficient in the context of your application.
+asyncToIOFinal :: Member (Final IO) r
+               => Sem (Async ': r) a
+               -> Sem r a
+asyncToIOFinal = interpretFinal $ \case
   Async m -> do
     ins <- getInspectorS
-    m' <- runS m
+    m'  <- runS m
     liftS $ A.async (inspect ins <$> m')
   Await a -> liftS (A.wait a)
+{-# INLINE asyncToIOFinal #-}
+
+------------------------------------------------------------------------------
+-- | Behaves very much like 'asyncToIO', but doesn't need to spin up an
+-- interpreter thread, making it more efficient (but not any more safe).
+asyncToIOFinalGlobal :: (Member (Final IO) r)
+                     => Sem (Async ': r) a
+                     -> Sem r a
+asyncToIOFinalGlobal = interpretFinalGlobal $ \restore -> \case
+  Async m -> do
+    ins <- getInspectorS
+    m'  <- runS m
+    liftS $ A.async (inspect ins <$> m')
+  Await a -> liftS (restore >> A.wait a)
+{-# INLINE asyncToIOFinalGlobal #-}

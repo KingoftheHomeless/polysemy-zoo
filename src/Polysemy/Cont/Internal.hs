@@ -1,6 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Polysemy.Cont.Internal where
 
+import Data.Functor.Contravariant
 import Polysemy
 import Polysemy.Internal
 import Polysemy.Internal.Union
@@ -95,4 +96,11 @@ embedSem = liftSem . weave (pure ()) (pure . join) inspectSem
 {-# INLINE embedSem #-}
 
 newtype Ref m s a = Ref { runRef :: a -> m s }
+
+instance Contravariant (Ref m s) where
+  contramap f ref = Ref (runRef ref . f)
+
 newtype ExitRef m a = ExitRef { enterExit :: forall b. a -> m b }
+
+instance Contravariant (ExitRef m) where
+  contramap f ref = ExitRef $ \a -> enterExit ref (f a)

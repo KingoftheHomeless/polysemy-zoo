@@ -72,9 +72,10 @@ test5 =
   . (`runStateT` 1)
   . (`runContT` (pure . Just))
   . runFinal
-  . runStateFinal
-  . runShiftFinal
-  . runReaderFinal
+  . embedToFinal
+  . stateToEmbed
+  . shiftToFinal
+  . readerToFinal
   $ do
   shift $ \c -> do
     _ <- local (+1) (c ())

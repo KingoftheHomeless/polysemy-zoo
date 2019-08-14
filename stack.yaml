@@ -4,8 +4,9 @@ packages:
 - .
 
 extra-deps:
-- polysemy-1.0.0.0
-- polysemy-plugin-0.2.1.0
+- github: KingoftheHomeless/polysemy
+  commit: bc49d919d8d67574271fbaf8fbab0c91116d11e4
+- polysemy-plugin-0.2.2.0
 - type-errors-0.2.0.0
 - type-errors-pretty-0.0.0.0
 - th-abstraction-0.3.1.0

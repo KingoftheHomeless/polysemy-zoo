@@ -68,7 +68,7 @@ test4 =
     (`S.runState` 1)
   . runM
   . runContM
-  . runStateFinal
+  . stateToEmbed
   $ stateTest
 
 test5 :: IO (Int, Int)
@@ -95,7 +95,7 @@ test7 =
   . runFinal
   . runTraceList
   . runReader ""
-  . runContFinal
+  . contToFinal
   $ do
   j <- local (++".") $ callCC $ \c -> do
     j <- ask
@@ -113,8 +113,8 @@ test8 =
      ($ 1)
    . (`C.runContT` pure)
    . runFinal
-   . runReaderFinal
-   . runContFinal
+   . readerToFinal
+   . contToFinal
    $ do
   callCC $ \c ->
     local (+1) (c ())
